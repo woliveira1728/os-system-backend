@@ -37,7 +37,7 @@ export class ChecklistService {
     });
   }
 
-  async update(checklistId: string, userId: string, data: { title?: string; completed?: boolean; notes?: string; required?: boolean; order?: number }) {
+  async update(checklistId: string, userId: string, data: { title?: string; completed?: boolean; required?: boolean; order?: number }) {
     const checklist = await prisma.checklist.findUnique({
       where: { id: checklistId },
       include: { orderRef: true },
@@ -49,7 +49,6 @@ export class ChecklistService {
       data: {
         title: data.title,
         completed: data.completed,
-        notes: data.notes,
         required: data.required,
         order: data.order,
       },

@@ -7,7 +7,6 @@ export interface CreateChecklistBody {
 export interface UpdateChecklistBody {
   title?: string;
   completed?: boolean;
-  notes?: string;
   required?: boolean;
   order?: number;
 }

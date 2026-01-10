@@ -5,7 +5,7 @@ import { OrderStatus, PriorityLevel } from '@prisma/client';
 
 @injectable()
 export class OrderService {
-  async create(userId: string, data: { title: string; description: string; location?: string; priority?: PriorityLevel; clientName?: string; clientPhone?: string; clientEmail?: string; scheduledAt?: Date; }) {
+  async create(userId: string, data: { title: string; description: string; priority?: PriorityLevel; scheduledAt?: Date; }) {
     if (!data.title || !data.description) throw new AppError(400, 'Title and description are required');
 
     return prisma.order.create({
@@ -13,11 +13,7 @@ export class OrderService {
         userId,
         title: data.title,
         description: data.description,
-        location: data.location,
         priority: data.priority ?? 'NORMAL',
-        clientName: data.clientName,
-        clientPhone: data.clientPhone,
-        clientEmail: data.clientEmail,
         scheduledAt: data.scheduledAt,
       },
       include: { checklist: true, photos: true },
@@ -48,7 +44,7 @@ export class OrderService {
     return order;
   }
 
-  async update(id: string, userId: string, data: Partial<{ title: string; description: string; status: OrderStatus; location: string; priority: PriorityLevel; clientName: string; clientPhone: string; clientEmail: string; scheduledAt: Date; completedAt: Date; }>) {
+  async update(id: string, userId: string, data: Partial<{ title: string; description: string; status: OrderStatus; priority: PriorityLevel; scheduledAt: Date; completedAt: Date; }>) {
     const exists = await prisma.order.findFirst({ where: { id, userId } });
     if (!exists) throw new AppError(404, 'Order not found');
 

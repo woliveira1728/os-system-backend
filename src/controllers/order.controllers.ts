@@ -1,31 +1,25 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { inject, injectable } from 'tsyringe';
-import { ChecklistService } from '../services';
+import { OrderService } from '../services';
 import { AppError } from '../errors/appError';
-import { CreateChecklistBody, UpdateChecklistBody } from '../interfaces';
+import { CreateOrderBody, UpdateOrderBody } from '../interfaces';
+import { OrderStatus } from '@prisma/client';
 
 @injectable()
-export class ChecklistController {
+export class OrderController {
   constructor(
-    @inject('ChecklistService')
-    private checklistService: ChecklistService
+    @inject('OrderService')
+    private orderService: OrderService
   ) {}
 
   async create(request: FastifyRequest, reply: FastifyReply): Promise<any> {
     try {
       const userId = (request as any).user.id;
-      const { orderId } = request.params as { orderId: string };
-      const data: CreateChecklistBody = request.body as CreateChecklistBody;
+      const data: CreateOrderBody = request.body as CreateOrderBody;
 
-      console.log('🔵 CREATE - Dados recebidos:', { orderId, userId, data });
-
-      const checklist = await this.checklistService.create(orderId, userId, data);
-      
-      console.log('✅ CREATE - Checklist criado:', checklist);
-
-      return reply.code(201).send(checklist);
+      const order = await this.orderService.create(userId, data);
+      return reply.code(201).send(order);
     } catch (error) {
-      console.error('❌ CREATE - Erro:', error);
       if (error instanceof AppError) {
         return reply.code(error.statusCode).send({ message: error.message });
       }
@@ -33,16 +27,28 @@ export class ChecklistController {
     }
   }
 
-  async findByOrderId(request: FastifyRequest, reply: FastifyReply): Promise<any> {
+  async findAll(request: FastifyRequest, reply: FastifyReply): Promise<any> {
     try {
       const userId = (request as any).user.id;
-      const { orderId } = request.params as { orderId: string };
+      const { status } = request.query as { status?: OrderStatus };
 
-      const checklists = await this.checklistService.findByOrderId(orderId, userId);
-      
-      console.log('📋 FIND - Checklists encontrados:', checklists);
+      const orders = await this.orderService.findAll(userId, status);
+      return reply.code(200).send(orders);
+    } catch (error) {
+      if (error instanceof AppError) {
+        return reply.code(error.statusCode).send({ message: error.message });
+      }
+      return reply.code(500).send({ message: 'Internal server error' });
+    }
+  }
 
-      return reply.code(200).send(checklists);
+  async findById(request: FastifyRequest, reply: FastifyReply): Promise<any> {
+    try {
+      const userId = (request as any).user.id;
+      const { id } = request.params as { id: string };
+
+      const order = await this.orderService.findById(id, userId);
+      return reply.code(200).send(order);
     } catch (error) {
       if (error instanceof AppError) {
         return reply.code(error.statusCode).send({ message: error.message });
@@ -55,15 +61,10 @@ export class ChecklistController {
     try {
       const userId = (request as any).user.id;
       const { id } = request.params as { id: string };
-      const data: UpdateChecklistBody = request.body as UpdateChecklistBody;
+      const data: UpdateOrderBody = request.body as UpdateOrderBody;
 
-      console.log('🔄 UPDATE - Dados recebidos:', { id, userId, data });
-
-      const checklist = await this.checklistService.update(id, userId, data);
-      
-      console.log('✅ UPDATE - Checklist atualizado:', checklist);
-
-      return reply.code(200).send(checklist);
+      const order = await this.orderService.update(id, userId, data);
+      return reply.code(200).send(order);
     } catch (error) {
       if (error instanceof AppError) {
         return reply.code(error.statusCode).send({ message: error.message });
@@ -77,9 +78,7 @@ export class ChecklistController {
       const userId = (request as any).user.id;
       const { id } = request.params as { id: string };
 
-      console.log('🗑️  DELETE - ID:', id);
-
-      await this.checklistService.delete(id, userId);
+      await this.orderService.delete(id, userId);
       return reply.code(204).send();
     } catch (error) {
       if (error instanceof AppError) {
@@ -89,18 +88,14 @@ export class ChecklistController {
     }
   }
 
-  async toggleComplete(request: FastifyRequest, reply: FastifyReply): Promise<any> {
+  async updateStatus(request: FastifyRequest, reply: FastifyReply): Promise<any> {
     try {
       const userId = (request as any).user.id;
       const { id } = request.params as { id: string };
+      const { status } = request.body as { status: OrderStatus };
 
-      console.log('🔀 TOGGLE - ID:', id);
-
-      const checklist = await this.checklistService.toggleComplete(id, userId);
-      
-      console.log('✅ TOGGLE - Checklist após toggle:', checklist);
-
-      return reply.code(200).send(checklist);
+      const order = await this.orderService.updateStatus(id, userId, status);
+      return reply.code(200).send(order);
     } catch (error) {
       if (error instanceof AppError) {
         return reply.code(error.statusCode).send({ message: error.message });

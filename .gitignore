@@ -1,5 +1,6 @@
 node_modules/
 **/node_modules/
+uploads/photos/
 
 package-lock.json
 yarn.lock
@@ -7,5 +8,3 @@ yarn.lock
 # Builds e env
 dist/
 .env
-
-

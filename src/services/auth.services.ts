@@ -55,7 +55,7 @@ export class AuthService {
   async register(
     userRegister: RegisterBody
   ): Promise<{ id: string; name: string; email: string; phone?: string; role: string }> {
-    const { email, name, password, phone, avatarUrl } = userRegister;
+    const { email, name, password, phone } = userRegister;
 
     if (!email || !password || !name) {
       throw new AppError(400, 'Name, email and password are required');
@@ -74,7 +74,6 @@ export class AuthService {
         email,
         passwordHash,
         phone: phone || null,
-        avatarUrl: avatarUrl || null,
         role: 'TECHNICIAN',
         isActive: true,
       },

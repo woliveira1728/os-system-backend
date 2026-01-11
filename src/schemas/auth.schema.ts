@@ -10,7 +10,6 @@ export const registerSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
   phone: z.string().optional(),
-  avatarUrl: z.string().url().optional(),
 });
 
 export type LoginBody = z.infer<typeof loginSchema>;

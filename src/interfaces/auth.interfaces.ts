@@ -3,7 +3,6 @@ export interface RegisterBody {
   email: string;
   password: string;
   phone?: string;
-  avatarUrl?: string;
 }
 
 export interface LoginBody {

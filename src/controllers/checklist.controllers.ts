@@ -17,11 +17,7 @@ export class ChecklistController {
       const { orderId } = request.params as { orderId: string };
       const data: CreateChecklistBody = request.body as CreateChecklistBody;
 
-      console.log('🔵 CREATE - Dados recebidos:', { orderId, userId, data });
-
       const checklist = await this.checklistService.create(orderId, userId, data);
-      
-      console.log('✅ CREATE - Checklist criado:', checklist);
 
       return reply.code(201).send(checklist);
     } catch (error) {
